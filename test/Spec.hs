@@ -5,11 +5,11 @@ import Test.Hspec.Core.QuickCheck (modifyMaxSize)
 
 main :: IO ()
 main = hspec $ do
-    describe "Longest Increasing Subsequence" $ do
-        modifyMaxSize (const 10000) $ it "is idempotent" $ do
+    modifyMaxSize (const 10000) $ describe "Longest Increasing Subsequence" $ do
+        it "is idempotent" $ do
             property $ \as -> lis as == (lis $ lis as :: [Int])
 
-    describe "Longest Common Subsequence" $ do
+    modifyMaxSize (const 10000) $ describe "Longest Common Subsequence" $ do
         it "is idempotent on the left" $ do
             property $ \as bs -> lcs as (lcs as bs) == (lcs as bs :: [Int])
 

@@ -25,6 +25,7 @@ dependencies:
 - hspec
 - hspec-core
 - QuickCheck
+- array
 
 library:
   source-dirs: src

@@ -6,24 +6,22 @@ module Lib
 import Data.Function
 import Data.List
 import Data.Maybe
+import qualified Data.Array as Array
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 
 -- Longest increasing subsequence
-lis :: (Show a, Ord a) => [a] -> [a]
+lis :: Ord a => [a] -> [a]
 lis = buildResult . snd  . mapAccumL takeMax (Set.empty, Nothing)
     where
         takeMax (endings, lastPreMax) value =
             let
                 upperBound = fromMaybe value $ Set.lookupGE value endings
                 newMax     = fromMaybe value $ Set.lookupMax newEndings
+                newPreMax  = Set.lookupLT newMax newEndings
                 newEndings = endings
                     & Set.delete upperBound
                     & Set.insert value
-                newPreMax =
-                    if upperBound == value
-                        then lastPreMax
-                        else Set.lookupLT newMax newEndings
             in
             ( (newEndings, newPreMax)
             , (newMax    , newPreMax)
@@ -39,27 +37,20 @@ lis = buildResult . snd  . mapAccumL takeMax (Set.empty, Nothing)
 
                 takeResult = fst
 
-lcs :: (Show a, Ord a) => [a] -> [a] -> [a]
-lcs rawL1 rawL2 = map fromIndex (lis $ fmap fst $ merged)
+-- Longest common subsequence
+lcs :: Ord a => [a] -> [a] -> [a]
+lcs l1 l2 = map atIndex (lis merged)
     where
-        l1 = rawL1
-        indexedL2 = reverse $ zip [0..] $ withOccurrences rawL2
-        fromIndex idx = rawL2 !! idx
+        byItem          = foldr addToList Map.empty $ Array.assocs l2Array
+        addToList v map = Map.insertWith (++) (snd v) [v] map
+        occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
+
+        l2Array         = Array.listArray (0, length l2 - 1) l2
+        atIndex idx = l2Array Array.! idx
+
         merged =
-            [ (idx, x)
-              | y <- l1                 -- For all elements of l1
-              , (idx, x) <- indexedL2   -- Get all elements of l2
-              , snd x == y                  -- Where their values are the same
+            [ idx
+              | y <- l1                     -- For each elements of l1
+              , (idx, x) <- occurrencesOf y -- Get all elements of l2
+              , x == y                      -- Where their values are the same
             ]
-
--- | Tag each value with how many times it has appeared in
--- the list so far.
--- O(nlogn)
-withOccurrences :: Ord a => [a] -> [(Int, a)]
-withOccurrences = snd . mapAccumL f Map.empty
-    where
-        f acc value = (newAcc, (occurrences, value))
-            where
-                newAcc      = Map.insertWith (+) value 1 acc
-                occurrences = fromJust $ Map.lookup value newAcc
-
