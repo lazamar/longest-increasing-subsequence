@@ -6,7 +6,6 @@ module Lib
 import Data.Function
 import Data.List
 import Data.Maybe
-import qualified Data.Array as Array
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 
@@ -39,18 +38,13 @@ lis = buildResult . snd  . mapAccumL takeMax (Set.empty, Nothing)
 
 -- Longest common subsequence
 lcs :: Ord a => [a] -> [a] -> [a]
-lcs l1 l2 = map atIndex (lis merged)
+lcs l1 l2 = fmap snd $ lis merged
     where
-        byItem          = foldr addToList Map.empty $ Array.assocs l2Array
+        byItem          = foldr addToList Map.empty $ zip [1..] l2
         addToList v map = Map.insertWith (++) (snd v) [v] map
         occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
-
-        l2Array         = Array.listArray (0, length l2 - 1) l2
-        atIndex idx = l2Array Array.! idx
-
         merged =
-            [ idx
+            [ (idx, x)
               | y <- l1                     -- For each elements of l1
-              , (idx, x) <- occurrencesOf y -- Get all elements of l2
-              , x == y                      -- Where their values are the same
+              , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
             ]
