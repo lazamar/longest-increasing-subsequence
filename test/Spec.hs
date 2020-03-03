@@ -2,14 +2,30 @@ import Test.Hspec
 import Test.QuickCheck
 import Lib
 import Test.Hspec.Core.QuickCheck (modifyMaxSize)
+import Data.List
 
 main :: IO ()
 main = hspec $ do
-    modifyMaxSize (const 10000) $ describe "Longest Increasing Subsequence" $ do
+    modifyMaxSize (const 100) $ describe "Longest Increasing Subsequence" $ do
         it "is idempotent" $ do
             property $ \as -> lis as == (lis $ lis as :: [Int])
 
-    modifyMaxSize (const 10000) $ describe "Longest Common Subsequence" $ do
+        it "Finds trivial results" $ do
+            lis [10, 5, 6, 1, 7] `shouldBe` [5,6,7]
+
+        it "Finds result in increasing subsequences" $ do
+            property $ \n ->
+                let list = take 10 $ fmap (n+) [1..] :: [Int]
+                in
+                lis list == nub list
+
+        it "Finds result in decreasing subsequences" $ do
+            property $ \n ->
+                let list = reverse $ take 10 $ fmap (n+) [1..] :: [Int]
+                in
+                length (lis list) == 1
+
+    modifyMaxSize (const 100) $ describe "Longest Common Subsequence" $ do
         it "is idempotent on the left" $ do
             property $ \as bs -> lcs as (lcs as bs) == (lcs as bs :: [Int])
 

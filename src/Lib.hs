@@ -8,28 +8,28 @@ import Data.List
 import Data.Maybe
 import qualified Data.Set as Set
 import qualified Data.Map as Map
-
+import Debug.Trace
 -- Longest increasing subsequence
-lis :: Ord a => [a] -> [a]
-lis = buildResult . snd  . mapAccumL takeMax (Set.empty, Nothing)
+lis :: (Show a, Ord a) => [a] -> [a]
+lis = buildResult . reverse . snd . mapAccumL takeMax Set.empty
     where
-        takeMax (endings, lastPreMax) value =
+        takeMax endings value =
             let
                 upperBound = fromMaybe value $ Set.lookupGE value endings
                 newMax     = fromMaybe value $ Set.lookupMax newEndings
-                newPreMax  = Set.lookupLT newMax newEndings
+                newPreMax  = Set.lookupLT value newEndings
                 newEndings = endings
                     & Set.delete upperBound
                     & Set.insert value
             in
-            ( (newEndings, newPreMax)
-            , (newMax    , newPreMax)
+            ( newEndings
+            , (value, newMax, newPreMax)
             )
 
         buildResult [] = []
-        buildResult ((max, premax):vals) = takeResult $ foldr f (max:[], premax) (reverse vals)
+        buildResult ((_, maxv, premax):vals) = takeResult $ foldr f (maxv:[], premax) (reverse vals)
             where
-                f (value, valueNext) (subsequence, next) =
+                f (value, _, valueNext) (subsequence, next) =
                     if Just value == next
                        then (value:subsequence, valueNext)
                        else (subsequence, next)
@@ -37,11 +37,11 @@ lis = buildResult . snd  . mapAccumL takeMax (Set.empty, Nothing)
                 takeResult = fst
 
 -- Longest common subsequence
-lcs :: Ord a => [a] -> [a] -> [a]
+lcs :: (Show a, Ord a) => [a] -> [a] -> [a]
 lcs l1 l2 = fmap snd $ lis merged
     where
         byItem          = foldr addToList Map.empty $ zip [1..] l2
-        addToList v map = Map.insertWith (++) (snd v) [v] map
+        addToList v m   = Map.insertWith (++) (snd v) [v] m
         occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
         merged =
             [ (idx, x)
