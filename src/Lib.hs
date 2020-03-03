@@ -11,9 +11,9 @@ import qualified Data.Map as Map
 import Debug.Trace
 -- Longest increasing subsequence
 lis :: (Show a, Ord a) => [a] -> [a]
-lis = buildResult . reverse . snd . mapAccumL takeMax Set.empty
+lis = uncurry buildResult . mapAccumL takeMax (Set.empty, undefined)
     where
-        takeMax endings value =
+        takeMax (endings,_) value =
             let
                 upperBound = fromMaybe value $ Set.lookupGE value endings
                 newMax     = fromMaybe value $ Set.lookupMax newEndings
@@ -22,14 +22,14 @@ lis = buildResult . reverse . snd . mapAccumL takeMax Set.empty
                     & Set.delete upperBound
                     & Set.insert value
             in
-            ( newEndings
-            , (value, newMax, newPreMax)
+            ( (newEndings, newMax   )
+            , (value     , newPreMax)
             )
 
-        buildResult [] = []
-        buildResult ((_, maxv, premax):vals) = takeResult $ foldr f (maxv:[], premax) (reverse vals)
+        buildResult _ [] = []
+        buildResult (_, maxv) vals = takeResult $ foldr f ([], Just maxv) vals
             where
-                f (value, _, valueNext) (subsequence, next) =
+                f (value, valueNext) (subsequence, next) =
                     if Just value == next
                        then (value:subsequence, valueNext)
                        else (subsequence, next)

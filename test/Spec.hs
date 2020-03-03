@@ -13,6 +13,11 @@ main = hspec $ do
         it "Finds trivial results" $ do
             lis [10, 5, 6, 1, 7] `shouldBe` [5,6,7]
 
+        it "Handles correctly values that displace ending max" $ do
+             lis [32,69,110,103,108,105,115,104,13,10]
+             `shouldBe`
+             [32,69,103,105,115]
+
         it "Finds result in increasing subsequences" $ do
             property $ \n ->
                 let list = take 10 $ fmap (n+) [1..] :: [Int]
