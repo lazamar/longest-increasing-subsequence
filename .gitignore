@@ -1,3 +1,5 @@
 .stack-work/
 temp.cabal
 *~
+.DS_Store
+
