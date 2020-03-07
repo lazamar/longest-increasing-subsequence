@@ -10,7 +10,7 @@ import Control.Monad
 main :: IO ()
 main = do
     content <- Text.readFile "assets/moby-dick.txt" :: IO Text.Text
-    let numbers =  take 10 $ drop 490 $ fmap ord $ Text.unpack content
+    let numbers = [5,6,7,1,2,3,4]
     print numbers
     print $ lis numbers
 

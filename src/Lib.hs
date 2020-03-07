@@ -9,32 +9,26 @@ import Data.Maybe
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Debug.Trace
+
 -- Longest increasing subsequence
 lis :: (Show a, Ord a) => [a] -> [a]
-lis = uncurry buildResult . mapAccumL takeMax (Set.empty, undefined)
+lis = toResult . foldl' takeMax Set.empty
     where
-        takeMax (endings,_) value =
+        takeMax endings value =
             let
-                upperBound = fromMaybe value $ Set.lookupGE value endings
-                newMax     = fromMaybe value $ Set.lookupMax newEndings
-                newPreMax  = Set.lookupLT value newEndings
-                newEndings = endings
-                    & Set.delete upperBound
-                    & Set.insert value
+                upperBound = Set.lookupGE (Leaf value) endings
+                preSelf    = Set.lookupLT (Leaf value) endings
+                self = case preSelf of
+                    Nothing  -> Leaf value -- Is minimum element
+                    Just val -> Node value val
+                newEndings = Set.insert self $
+                    case upperBound of
+                        Nothing -> endings -- Is maximum element
+                        Just up -> Set.delete up endings
             in
-            ( (newEndings, newMax   )
-            , (value     , newPreMax)
-            )
+            newEndings
 
-        buildResult _ [] = []
-        buildResult (_, maxv) vals = takeResult $ foldr f ([], Just maxv) vals
-            where
-                f (value, valueNext) (subsequence, next) =
-                    if Just value == next
-                       then (value:subsequence, valueNext)
-                       else (subsequence, next)
-
-                takeResult = fst
+        toResult = fromMaybe [] . fmap trackToList . Set.lookupMax
 
 -- Longest common subsequence
 lcs :: (Show a, Ord a) => [a] -> [a] -> [a]
@@ -48,3 +42,23 @@ lcs l1 l2 = fmap snd $ lis merged
               | y <- l1                     -- For each elements of l1
               , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
             ]
+
+data Track a
+  = Leaf a
+  | Node a (Track a)
+
+thead :: Track a -> a
+thead (Leaf a) = a
+thead (Node a _) = a
+
+trackToList :: Track a -> [a]
+trackToList = go []
+    where
+        go acc (Leaf a) = a:acc
+        go acc (Node a track) = go (a:acc) track
+
+instance Eq a => Eq (Track a) where
+    t1 == t2 = thead t1 == thead t2
+
+instance Ord a => Ord (Track a) where
+    t1 `compare` t2 = thead t1 `compare` thead t2
