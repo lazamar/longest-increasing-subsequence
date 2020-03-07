@@ -8,9 +8,11 @@ import Data.Char
 import Data.List
 import Control.Monad
 import System.IO
+import System.Environment
 
 main :: IO ()
 main = do
-    content <- Text.readFile "assets/small.txt"
+    fileName:[] <- getArgs
+    content <- Text.readFile fileName
     print $ lis Text.foldl' content
 
