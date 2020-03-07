@@ -1,3 +1,5 @@
+{-# LANGUAGE Rank2Types #-}
+
 module Lib
     ( lcs
     , lis
@@ -11,8 +13,11 @@ import qualified Data.Map as Map
 import Debug.Trace
 
 -- Longest increasing subsequence
-lis :: (Show a, Ord a) => [a] -> [a]
-lis = toResult . foldl' takeMax Set.empty
+lis :: (Show item, Ord item)
+    => (forall a. (a -> item -> a) -> a -> container -> a) -- ^ foldl'
+    -> container
+    -> [item]
+lis foldlFun = toResult . foldlFun takeMax Set.empty
     where
         takeMax endings value =
             let
@@ -32,7 +37,7 @@ lis = toResult . foldl' takeMax Set.empty
 
 -- Longest common subsequence
 lcs :: (Show a, Ord a) => [a] -> [a] -> [a]
-lcs l1 l2 = fmap snd $ lis merged
+lcs l1 l2 = fmap snd $ lis foldl' merged
     where
         byItem          = foldr addToList Map.empty $ zip [1..] l2
         addToList v m   = Map.insertWith (++) (snd v) [v] m
