@@ -5,48 +5,56 @@ module Lib
     , lis
     ) where
 
+import Control.Arrow ((***))
 import Data.Function
 import Data.List
 import Data.Maybe
+import Data.Word
+import Data.BitSet as BitSet
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Debug.Trace
 
 -- Longest increasing subsequence
-lis :: (Show item, Ord item)
-    => (forall a. (a -> item -> a) -> a -> container -> a) -- ^ foldl'
-    -> container
-    -> [item]
-lis foldlFun = toResult . foldlFun takeMax Set.empty
+lis :: [Word8] -> [Word8]
+lis = toResult . foldl' takeMax (Set.empty, BitSet.empty)
     where
-        takeMax endings value =
-            let
-                upperBound = Set.lookupGE (Leaf value) endings
-                preSelf    = Set.lookupLT (Leaf value) endings
-                self = case preSelf of
-                    Nothing  -> Leaf value -- Is minimum element
-                    Just val -> Node value val
-                newEndings = Set.insert self $
-                    case upperBound of
-                        Nothing -> endings -- Is maximum element
-                        Just up -> Set.delete up endings
-            in
-            newEndings
+        takeMax (endings, bitSet) value =
+            if BitSet.member value bitSet
+               then (endings, bitSet)
+               else
+                    let upperBound = Set.lookupGE (Leaf value) endings
+                        preSelf    = Set.lookupLT (Leaf value) endings
+                        self = case preSelf of
+                            Nothing  -> Leaf value -- Is minimum element
+                            Just val -> Node value val
 
-        toResult = fromMaybe [] . fmap trackToList . Set.lookupMax
+                        (newEndings, newBitSet)
+                            = (Set.insert self *** BitSet.insert value)
+                            $ case upperBound of
+                                Nothing -> (endings, bitSet) -- Is maximum element
+                                Just up ->
+                                    ( Set.delete up endings
+                                    , BitSet.remove (thead up) bitSet
+                                    )
+                    in
+                    (newEndings, newBitSet)
+
+        toResult = fromMaybe [] . fmap trackToList . Set.lookupMax . fst
 
 -- Longest common subsequence
-lcs :: (Show a, Ord a) => [a] -> [a] -> [a]
-lcs l1 l2 = fmap snd $ lis foldl' merged
-    where
-        byItem          = foldr addToList Map.empty $ zip [1..] l2
-        addToList v m   = Map.insertWith (++) (snd v) [v] m
-        occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
-        merged =
-            [ (idx, x)
-              | y <- l1                     -- For each elements of l1
-              , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
-            ]
+lcs :: (Show a, Ord a, Enum a) => [a] -> [a] -> [a]
+lcs = undefined
+-- lcs l1 l2 = fmap snd $ lis merged
+--      where
+--          byItem          = foldr addToList Map.empty $ zip [1..] l2
+--          addToList v m   = Map.insertWith (++) (snd v) [v] m
+--          occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
+--          merged =
+--              [ (idx, x)
+--                | y <- l1                     -- For each elements of l1
+--                , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
+--              ]
 
 data Track a
   = Leaf a
@@ -67,3 +75,7 @@ instance Eq a => Eq (Track a) where
 
 instance Ord a => Ord (Track a) where
     t1 `compare` t2 = thead t1 `compare` thead t2
+
+instance Enum a => Enum (Track a) where
+    toEnum   = Leaf . toEnum
+    fromEnum = fromEnum . thead

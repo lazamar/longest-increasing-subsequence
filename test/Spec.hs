@@ -8,7 +8,7 @@ main :: IO ()
 main = hspec $ do
     modifyMaxSize (const 100) $ describe "Longest Increasing Subsequence" $ do
         it "is idempotent" $ do
-            property $ \as -> lis as == (lis $ lis as :: [Int])
+            property $ \as -> lis as == (lis $ lis as )
 
         it "Finds trivial results" $ do
             lis [10, 5, 6, 1, 7] `shouldBe` [5,6,7]
@@ -19,23 +19,19 @@ main = hspec $ do
              [32,69,103,105,115]
 
         it "Finds result in increasing subsequences" $ do
-            property $ \n ->
-                let list = take 10 $ fmap (n+) [1..] :: [Int]
-                in
-                lis list == nub list
+                let list = take 10 [1..]
+                lis list `shouldBe` nub list
 
         it "Finds result in decreasing subsequences" $ do
-            property $ \n ->
-                let list = reverse $ take 10 $ fmap (n+) [1..] :: [Int]
-                in
-                length (lis list) == 1
+                let list = reverse $ take 10 [1..]
+                length (lis list) `shouldBe` 1
 
-    modifyMaxSize (const 100) $ describe "Longest Common Subsequence" $ do
-        it "is idempotent on the left" $ do
-            property $ \as bs -> lcs as (lcs as bs) == (lcs as bs :: [Int])
+    -- modifyMaxSize (const 100) $ describe "Longest Common Subsequence" $ do
+    --     it "is idempotent on the left" $ do
+    --         property $ \as bs -> lcs as (lcs as bs) == (lcs as bs :: [Int])
 
-        it "is idempotent on the right" $ do
-            property $ \as bs -> lcs (lcs as bs) bs == (lcs as bs :: [Int])
+    --     it "is idempotent on the right" $ do
+    --         property $ \as bs -> lcs (lcs as bs) bs == (lcs as bs :: [Int])
 
-        it "returns something smaller" $ do
-            property $ \as bs -> min (length as) (length bs) >= length (lcs as bs :: [Int])
+    --     it "returns something smaller" $ do
+    --         property $ \as bs -> min (length as) (length bs) >= length (lcs as bs :: [Int])

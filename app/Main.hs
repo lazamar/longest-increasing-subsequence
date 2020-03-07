@@ -13,6 +13,9 @@ import System.Environment
 main :: IO ()
 main = do
     fileName:[] <- getArgs
-    content <- Text.readFile fileName
-    print $ lis Text.foldl' content
+    content <- readFile fileName
+    print
+        $ fmap (chr . fromIntegral)
+        $ lis
+        $ fmap (fromIntegral . ord) content
 
