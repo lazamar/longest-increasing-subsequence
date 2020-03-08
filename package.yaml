@@ -27,6 +27,7 @@ dependencies:
 - QuickCheck
 - array
 - text
+- bytestring
 
 library:
   source-dirs: src

@@ -12,14 +12,14 @@ import Data.Maybe
 import Data.BitSet as BitSet
 import qualified Data.Set as Set
 import qualified Data.Map as Map
-import Debug.Trace
 
 -- Longest increasing subsequence
-lis :: (Show item, Ord item, Enum item)
-    => (forall a. (a -> item -> a) -> a -> container -> a) -- ^ foldl'
+lis :: (Ord item)
+    => (item -> Int) -- ^ Must be injective
+    -> (forall a.  (a -> item -> a) -> a -> container -> a) -- ^ foldl'
     -> container
     -> [item]
-lis foldlFun = toResult . foldlFun takeMax (Set.empty, BitSet.empty)
+lis toInt foldlFun = toResult . foldlFun takeMax (Set.empty, BitSet.empty toInt)
     where
         takeMax (endings, bitSet) value =
             if BitSet.member value bitSet
@@ -45,18 +45,17 @@ lis foldlFun = toResult . foldlFun takeMax (Set.empty, BitSet.empty)
         toResult = fromMaybe [] . fmap trackToList . Set.lookupMax . fst
 
 -- Longest common subsequence
-lcs :: (Show a, Ord a, Enum a) => [a] -> [a] -> [a]
-lcs = undefined
--- lcs l1 l2 = fmap snd $ lis foldl' merged
---     where
---         byItem          = foldr addToList Map.empty $ zip [1..] l2
---         addToList v m   = Map.insertWith (++) (snd v) [v] m
---         occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
---         merged =
---             [ (idx, x)
---               | y <- l1                     -- For each elements of l1
---               , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
---             ]
+lcs :: (Ord a) => [a] -> [a] -> [a]
+lcs l1 l2 = fmap snd $ lis (fromIntegral . fst) foldl' merged
+     where
+         byItem          = foldr addToList Map.empty $ zip [1..] l2
+         addToList v m   = Map.insertWith (++) (snd v) [v] m
+         occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
+         merged =
+             [ (idx, x)
+               | y <- l1                     -- For each elements of l1
+               , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
+             ]
 
 data Track a
   = Leaf a
@@ -77,7 +76,3 @@ instance Eq a => Eq (Track a) where
 
 instance Ord a => Ord (Track a) where
     t1 `compare` t2 = thead t1 `compare` thead t2
-
-instance Enum a => Enum (Track a) where
-    toEnum   = Leaf . toEnum
-    fromEnum = fromEnum . thead

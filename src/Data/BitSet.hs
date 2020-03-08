@@ -1,19 +1,25 @@
-module Data.BitSet where
+module Data.BitSet
+    ( BitSet
+    , empty
+    , insert
+    , remove
+    , member
+    ) where
 
 import Data.Bits
+import Data.Word
 
-newtype BitSet a = BitSet Integer
-    deriving (Show, Eq)
+data BitSet a = BitSet (a -> Int) Integer
 
-empty :: BitSet a
-empty = BitSet zeroBits
+empty :: (a -> Int) -> BitSet a
+empty f = BitSet f zeroBits
 
-insert :: Enum a => a -> BitSet a -> BitSet a
-insert v (BitSet b) = BitSet $ setBit b $ fromEnum v
+insert :: a -> BitSet a -> BitSet a
+insert v (BitSet f b) = BitSet f $ setBit b $ f v
 
-remove :: Enum a => a -> BitSet a -> BitSet a
-remove v (BitSet b) = BitSet $ clearBit b $ fromEnum v
+remove :: a -> BitSet a -> BitSet a
+remove v (BitSet f b) = BitSet f $ clearBit b $ f v
 
-member :: Enum a => a -> BitSet a -> Bool
-member v (BitSet b) = testBit b $ fromEnum v
+member :: a -> BitSet a -> Bool
+member v (BitSet f b) = testBit b $ f v
 

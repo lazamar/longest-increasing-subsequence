@@ -5,7 +5,9 @@ import Test.Hspec.Core.QuickCheck (modifyMaxSize)
 import Data.List
 import Data.Word
 
-lis = Lib.lis foldl'
+lis = Lib.lis fromIntegral foldl'
+
+lcs = Lib.lcs
 
 main :: IO ()
 main = hspec $ do
@@ -29,12 +31,12 @@ main = hspec $ do
                 let list = reverse $ take 10 [1..]
                 length (lis list) `shouldBe` 1
 
-    -- modifyMaxSize (const 100) $ describe "Longest Common Subsequence" $ do
-    --     it "is idempotent on the left" $ do
-    --         property $ \as bs -> lcs as (lcs as bs) == (lcs as bs :: [Int])
+    modifyMaxSize (const 100) $ describe "Longest Common Subsequence" $ do
+         it "is idempotent on the left" $ do
+             property $ \as bs -> lcs as (lcs as bs) == (lcs as bs :: [Word8])
 
-    --     it "is idempotent on the right" $ do
-    --         property $ \as bs -> lcs (lcs as bs) bs == (lcs as bs :: [Int])
+         it "is idempotent on the right" $ do
+             property $ \as bs -> lcs (lcs as bs) bs == (lcs as bs :: [Word8])
 
-    --     it "returns something smaller" $ do
-    --         property $ \as bs -> min (length as) (length bs) >= length (lcs as bs :: [Int])
+         it "returns something smaller" $ do
+             property $ \as bs -> min (length as) (length bs) >= length (lcs as bs :: [Word8])
