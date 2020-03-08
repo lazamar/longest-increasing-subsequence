@@ -9,15 +9,17 @@ import Control.Arrow ((***))
 import Data.Function
 import Data.List
 import Data.Maybe
-import Data.Word
 import Data.BitSet as BitSet
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Debug.Trace
 
 -- Longest increasing subsequence
-lis :: [Word8] -> [Word8]
-lis = toResult . foldl' takeMax (Set.empty, BitSet.empty)
+lis :: (Show item, Ord item, Enum item)
+    => (forall a. (a -> item -> a) -> a -> container -> a) -- ^ foldl'
+    -> container
+    -> [item]
+lis foldlFun = toResult . foldlFun takeMax (Set.empty, BitSet.empty)
     where
         takeMax (endings, bitSet) value =
             if BitSet.member value bitSet
@@ -45,16 +47,16 @@ lis = toResult . foldl' takeMax (Set.empty, BitSet.empty)
 -- Longest common subsequence
 lcs :: (Show a, Ord a, Enum a) => [a] -> [a] -> [a]
 lcs = undefined
--- lcs l1 l2 = fmap snd $ lis merged
---      where
---          byItem          = foldr addToList Map.empty $ zip [1..] l2
---          addToList v m   = Map.insertWith (++) (snd v) [v] m
---          occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
---          merged =
---              [ (idx, x)
---                | y <- l1                     -- For each elements of l1
---                , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
---              ]
+-- lcs l1 l2 = fmap snd $ lis foldl' merged
+--     where
+--         byItem          = foldr addToList Map.empty $ zip [1..] l2
+--         addToList v m   = Map.insertWith (++) (snd v) [v] m
+--         occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
+--         merged =
+--             [ (idx, x)
+--               | y <- l1                     -- For each elements of l1
+--               , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
+--             ]
 
 data Track a
   = Leaf a

@@ -1,14 +1,17 @@
 import Test.Hspec
 import Test.QuickCheck
-import Lib
+import qualified Lib
 import Test.Hspec.Core.QuickCheck (modifyMaxSize)
 import Data.List
+import Data.Word
+
+lis = Lib.lis foldl'
 
 main :: IO ()
 main = hspec $ do
     modifyMaxSize (const 100) $ describe "Longest Increasing Subsequence" $ do
         it "is idempotent" $ do
-            property $ \as -> lis as == (lis $ lis as )
+            property $ \as -> lis as == (lis $ lis as :: [Word8])
 
         it "Finds trivial results" $ do
             lis [10, 5, 6, 1, 7] `shouldBe` [5,6,7]
