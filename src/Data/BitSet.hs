@@ -6,19 +6,20 @@ module Data.BitSet
     , member
     ) where
 
-import qualified Data.IntSet as IntSet
+import Data.Bits
+import Basement.Types.Word256 (Word256)
 
-data BitSet a = BitSet (a -> Int) IntSet.IntSet
+newtype BitSet = BitSet Word256
 
-empty :: (a -> Int) -> BitSet a
-empty f = BitSet f IntSet.empty
+empty :: BitSet
+empty = BitSet zeroBits
 
-insert :: a -> BitSet a -> BitSet a
-insert v (BitSet f b) = BitSet f $ IntSet.insert (f v) b
+insert :: Int -> BitSet -> BitSet
+insert v (BitSet b) = BitSet $ setBit b v
 
-remove :: a -> BitSet a -> BitSet a
-remove v (BitSet f b) = BitSet f $ IntSet.delete (f v) b
+remove :: Int -> BitSet -> BitSet
+remove v (BitSet b) = BitSet $ clearBit b v
 
-member :: a -> BitSet a -> Bool
-member v (BitSet f b) = IntSet.member (f v) b
+member :: Int -> BitSet -> Bool
+member v (BitSet b) = testBit b v
 

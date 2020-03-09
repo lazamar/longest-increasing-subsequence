@@ -28,6 +28,7 @@ dependencies:
 - array
 - text
 - bytestring
+- basement
 
 library:
   source-dirs: src

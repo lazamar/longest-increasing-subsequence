@@ -18,8 +18,8 @@ lis :: (Ord item)
     => (item -> Int) -- ^ Must be injective
     -> (forall a.  (a -> item -> a) -> a -> container -> a) -- ^ foldl'
     -> container
-    -> [item]
-lis toInt foldlFun = toResult . foldlFun takeMax (Set.empty, BitSet.empty toInt)
+    -> [Int]
+lis toInt foldlFun = toResult . foldlFun (\t v -> takeMax t $ toInt v) (Set.empty, BitSet.empty)
     where
         takeMax (endings, bitSet) value =
             if BitSet.member value bitSet
@@ -46,16 +46,17 @@ lis toInt foldlFun = toResult . foldlFun takeMax (Set.empty, BitSet.empty toInt)
 
 -- Longest common subsequence
 lcs :: (Ord a) => [a] -> [a] -> [a]
-lcs l1 l2 = fmap snd $ lis (fromIntegral . fst) foldl' merged
-     where
-         byItem          = foldr addToList Map.empty $ zip [1..] l2
-         addToList v m   = Map.insertWith (++) (snd v) [v] m
-         occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
-         merged =
-             [ (idx, x)
-               | y <- l1                     -- For each elements of l1
-               , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
-             ]
+lcs = undefined
+-- lcs l1 l2 = fmap snd $ lis (fromIntegral . fst) foldl' merged
+--      where
+--          byItem          = foldr addToList Map.empty $ zip [1..] l2
+--          addToList v m   = Map.insertWith (++) (snd v) [v] m
+--          occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
+--          merged =
+--              [ (idx, x)
+--                | y <- l1                     -- For each elements of l1
+--                , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
+--              ]
 
 data Track a
   = Leaf a
