@@ -12,14 +12,11 @@ import Data.Maybe
 import Data.BitSet as BitSet
 import qualified Data.Set as Set
 import qualified Data.Map as Map
+import qualified Data.ByteString.Lazy as B
 
 -- Longest increasing subsequence
-lis :: (Ord item)
-    => (item -> Int) -- ^ Must be injective
-    -> (forall a.  (a -> item -> a) -> a -> container -> a) -- ^ foldl'
-    -> container
-    -> [Int]
-lis toInt foldlFun = toResult . foldlFun (\t v -> takeMax t $ toInt v) (Set.empty, BitSet.empty)
+lis :: B.ByteString -> [Int]
+lis = toResult . B.foldl' (\t v -> takeMax t $ fromIntegral v) (Set.empty, BitSet.empty)
     where
         takeMax (endings, bitSet) value =
             if BitSet.member value bitSet

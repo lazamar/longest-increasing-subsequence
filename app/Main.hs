@@ -12,5 +12,5 @@ main :: IO ()
 main = do
     fileName:[] <- getArgs
     content <- B.readFile fileName
-    putStrLn $ fmap (chr . fromIntegral) $ lis fromIntegral B.foldl' content
+    putStrLn $ fmap (chr . fromIntegral) $ lis content
 
