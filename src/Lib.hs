@@ -5,41 +5,51 @@ module Lib
     , lis
     ) where
 
-import Control.Arrow ((***))
+import Data.Bifunctor (first, second)
+import Data.BitSet as BitSet
 import Data.Function
 import Data.List
 import Data.Maybe
-import Data.BitSet as BitSet
-import qualified Data.Set as Set
-import qualified Data.Map as Map
+import Data.Set (Set)
+import Data.Word
+
 import qualified Data.ByteString.Lazy as B
+import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 -- Longest increasing subsequence
 lis :: B.ByteString -> [Int]
-lis = toResult . B.foldl' (\t v -> takeMax t $ fromIntegral v) (Set.empty, BitSet.empty)
+lis = fromMaybe []
+    . fmap trackToList
+    . Set.lookupMax
+    . fst
+    . B.foldl' takeMax (Set.empty, BitSet.empty)
+
+type Accumulator = (Set (Track Int), BitSet)
+
+takeMax :: Accumulator -> Word8 -> Accumulator
+takeMax (endings, bitSet) word8value =
+    if BitSet.member value bitSet
+       then (endings, bitSet)
+       else (newEndings, newBitSet)
     where
-        takeMax (endings, bitSet) value =
-            if BitSet.member value bitSet
-               then (endings, bitSet)
-               else
-                    let upperBound = Set.lookupGE (Leaf value) endings
-                        preSelf    = Set.lookupLT (Leaf value) endings
-                        self = case preSelf of
-                            Nothing  -> Leaf value -- Is minimum element
-                            Just val -> Node value val
+        value      = fromIntegral word8value
+        upperBound = Set.lookupGE (Leaf value) endings
+        preSelf    = Set.lookupLT (Leaf value) endings
+        self       =
+            case preSelf of
+                Nothing  -> Leaf value -- Is minimum element
+                Just val -> Node value val
 
-                        (newEndings, newBitSet)
-                            = (Set.insert self *** BitSet.insert value)
-                            $ case upperBound of
-                                Nothing -> (endings, bitSet) -- Is maximum element
-                                Just up ->
-                                    ( Set.delete up endings
-                                    , BitSet.remove (thead up) bitSet
-                                    )
-                    in
-                    (newEndings, newBitSet)
-
-        toResult = fromMaybe [] . fmap trackToList . Set.lookupMax . fst
+        (newEndings, newBitSet)
+            = first  (Set.insert self)
+            $ second (BitSet.insert value)
+            $ case upperBound of
+                Nothing -> (endings, bitSet) -- Is maximum element
+                Just up ->
+                    ( Set.delete up endings
+                    , BitSet.remove (thead up) bitSet
+                    )
 
 -- Longest common subsequence
 lcs :: (Ord a) => [a] -> [a] -> [a]
