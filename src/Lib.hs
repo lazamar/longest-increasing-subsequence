@@ -3,6 +3,7 @@
 module Lib
     ( lcs
     , lis
+    , main
     ) where
 
 import Data.Bifunctor (first, second)
@@ -12,14 +13,24 @@ import Data.List
 import Data.Maybe
 import Data.Set (Set)
 import Data.Word
+import Data.Char
+import System.Environment (getArgs)
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 
+main :: IO ()
+main = do
+    fileName:[] <- getArgs
+    content <- B.readFile fileName
+    putStrLn $ lis content
+
+
 -- Longest increasing subsequence
-lis :: B.ByteString -> [Int]
-lis = fromMaybe []
+lis :: B.ByteString -> String
+lis = fmap chr
+    . fromMaybe []
     . fmap trackToList
     . Set.lookupMax
     . fst

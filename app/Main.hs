@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import qualified Lib
 import System.Environment
 import System.IO
 import System.Environment
@@ -9,8 +9,4 @@ import qualified Data.ByteString.Lazy as B
 import Data.Char
 
 main :: IO ()
-main = do
-    fileName:[] <- getArgs
-    content <- B.readFile fileName
-    putStrLn $ fmap (chr . fromIntegral) $ lis content
-
+main = Lib.main
