@@ -1,5 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-
 module Data.BitSet
     ( BitSet
     , empty
@@ -8,11 +6,10 @@ module Data.BitSet
     , member
     ) where
 
---import Data.Bits
+
 import qualified Data.Vector.Unboxed as V
 import qualified Data.Vector.Generic.Mutable as V (write)
 
---newtype BitSet = BitSet (MuArray (Offset Bool) (CountOf Bool))
 newtype BitSet = BitSet (V.Vector Bool)
 
 empty :: BitSet
@@ -25,8 +22,7 @@ remove :: Int -> BitSet -> BitSet
 remove v (BitSet b) = BitSet $ setBit False b v
 
 member :: Int -> BitSet -> Bool
-member v (BitSet b) = testBit b v
+member v (BitSet b) = b V.! v
 
-
+setBit :: Bool ->V.Vector Bool -> Int -> V.Vector Bool
 setBit value vector n = V.modify (\v' -> V.write v' n value) vector
-testBit  vector n = vector V.! n

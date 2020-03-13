@@ -8,8 +8,6 @@ module Lib
 
 import Data.Bifunctor (first, second)
 import Data.BitSet as BitSet
-import Data.Function
-import Data.List
 import Data.Maybe
 import Data.Set (Set)
 import Data.Word
@@ -17,7 +15,6 @@ import Data.Char
 import System.Environment (getArgs)
 
 import qualified Data.ByteString.Lazy as B
-import qualified Data.Map as Map
 import qualified Data.Set as Set
 
 main :: IO ()
