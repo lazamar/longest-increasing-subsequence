@@ -26,7 +26,6 @@ main = do
     content <- B.readFile fileName
     putStrLn $ lis content
 
-
 -- Longest increasing subsequence
 lis :: B.ByteString -> String
 lis = fmap chr
