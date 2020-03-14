@@ -13,7 +13,7 @@ import qualified Data.Vector.Generic.Mutable as V (write)
 newtype BitSet = BitSet (V.Vector Bool)
 
 empty :: BitSet
-empty = BitSet $ V.fromList $ fmap (const False) [1..20000]
+empty = BitSet $ V.fromList $ fmap (const False) [1..256]
 
 insert :: Int -> BitSet -> BitSet
 insert v (BitSet b) = BitSet $ setBit True b v
