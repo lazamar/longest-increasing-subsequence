@@ -21,6 +21,7 @@ insert v (BitSet b) = BitSet $ setBit True b v
 remove :: Int -> BitSet -> BitSet
 remove v (BitSet b) = BitSet $ setBit False b v
 
+{-# INLINE member #-}
 member :: Int -> BitSet -> Bool
 member v (BitSet b) = b V.! v
 

@@ -58,20 +58,6 @@ takeMax (endings, bitSet) word8value =
                     , BitSet.remove (thead up) bitSet
                     )
 
--- Longest common subsequence
-lcs :: (Ord a) => [a] -> [a] -> [a]
-lcs = undefined
--- lcs l1 l2 = fmap snd $ lis (fromIntegral . fst) foldl' merged
---      where
---          byItem          = foldr addToList Map.empty $ zip [1..] l2
---          addToList v m   = Map.insertWith (++) (snd v) [v] m
---          occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
---          merged =
---              [ (idx, x)
---                | y <- l1                     -- For each elements of l1
---                , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
---              ]
-
 data Track a
   = Leaf a
   | Node a (Track a)
@@ -91,3 +77,18 @@ instance Eq a => Eq (Track a) where
 
 instance Ord a => Ord (Track a) where
     t1 `compare` t2 = thead t1 `compare` thead t2
+
+
+-- Longest common subsequence
+lcs :: (Ord a) => [a] -> [a] -> [a]
+lcs = undefined
+-- lcs l1 l2 = fmap snd $ lis (fromIntegral . fst) foldl' merged
+--      where
+--          byItem          = foldr addToList Map.empty $ zip [1..] l2
+--          addToList v m   = Map.insertWith (++) (snd v) [v] m
+--          occurrencesOf v = fromMaybe [] $ Map.lookup v byItem
+--          merged =
+--              [ (idx, x)
+--                | y <- l1                     -- For each elements of l1
+--                , (idx, x) <- occurrencesOf y -- Get all elements of l2 where their values are the same
+--              ]
