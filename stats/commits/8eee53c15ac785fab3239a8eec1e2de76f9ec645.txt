@@ -1,0 +1,5 @@
+<<ghc: 55021376 bytes, 51 GCs, 184084/217656 avg/max bytes residency (2 samples), 11M in use, 0.001 INIT (0.006 elapsed), 0.071 MUT (0.077 elapsed), 0.010 GC (0.001 elapsed) :ghc>>
+<<ghc: 55027912 bytes, 51 GCs, 190504/224144 avg/max bytes residency (2 samples), 11M in use, 0.001 INIT (0.005 elapsed), 0.093 MUT (0.098 elapsed), 0.010 GC (0.001 elapsed) :ghc>>
+<<ghc: 55027784 bytes, 51 GCs, 190640/224144 avg/max bytes residency (2 samples), 11M in use, 0.001 INIT (0.005 elapsed), 0.092 MUT (0.096 elapsed), 0.009 GC (0.001 elapsed) :ghc>>
+<<ghc: 55027568 bytes, 51 GCs, 190640/224144 avg/max bytes residency (2 samples), 11M in use, 0.001 INIT (0.005 elapsed), 0.093 MUT (0.098 elapsed), 0.010 GC (0.001 elapsed) :ghc>>
+<<ghc: 55027744 bytes, 51 GCs, 190640/224144 avg/max bytes residency (2 samples), 11M in use, 0.001 INIT (0.005 elapsed), 0.092 MUT (0.097 elapsed), 0.010 GC (0.002 elapsed) :ghc>>
